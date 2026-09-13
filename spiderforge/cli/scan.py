@@ -35,6 +35,9 @@ from spiderforge.scope.validator import ScopeValidator
 from spiderforge.utils.logging import get_logger, setup_logging
 from spiderforge.utils.timestamps import isoformat, scan_id
 
+# استيراد المحرك الموحد الجديد
+from spiderforge.core.engine import run_full_security_assessment
+
 app = typer.Typer(name="scan", help="Full end-to-end assessment.")
 console = Console()
 log = get_logger("cli.scan")
@@ -242,9 +245,9 @@ def scan_run(
             )
             result_payload["discovery_stats"] = discovery_result.stats
 
-        # --- Analysis --------------------------------------------------
+        # --- Analysis (with unified engine support) --------------------
         if not quiet:
-            console.print("[bold]Analysis[/bold]")
+            console.print("[bold]Analysis & Security Scanners[/bold]")
 
         async with httpx.AsyncClient(
             follow_redirects=False,
@@ -264,6 +267,29 @@ def scan_run(
             )
             analysis = await run_modules(selected_modules, ctx=ctx, bus=bus)
 
+        # --- Integrations of Unified Engine Scanners (e.g. XSS Engine) ---
+        try:
+            # دمج المحرك الموحد المخصص (مثل موديول الـ XSS الجديد)
+            engine_results = await run_full_security_assessment(target)
+            if engine_results and engine_results.get("findings"):
+                for eng_finding in engine_results["findings"]:
+                    # تحويل النتائج إلى كائن Finding قياسي إذا لزم الأمر
+                    from spiderforge.findings.models import Finding, Severity, FindingStatus, Evidence
+                    custom_finding = Finding(
+                        id=f"XSS-{scan_id()[:6]}",
+                        title=eng_finding.get("type", "Reflected XSS"),
+                        category="injection",
+                        severity=Severity.HIGH,
+                        confidence=0.9,
+                        url=target,
+                        parameter=eng_finding.get("param"),
+                        description=eng_finding.get("evidence"),
+                        evidence=Evidence(payload=eng_finding.get("payload"))
+                    )
+                    analysis.findings.append(custom_finding)
+        except Exception as e:
+            log.debug(f"Unified engine assessment notice: {e}")
+
         # --- Enrich with CVSS + persist evidence (before DB write) ------------- #
         collector = EvidenceCollector(workspace)
         for f in analysis.findings:
@@ -272,7 +298,7 @@ def scan_run(
                 if scored is not None:
                     f.cvss_score, f.cvss_vector = scored
             # Persist whatever evidence we already have as an artifact
-            if f.evidence.request or f.evidence.response:
+            if f.evidence.request or f.evidence.response or f.evidence.payload:
                 collector.capture_text(
                     f,
                     name="raw_evidence.txt",
