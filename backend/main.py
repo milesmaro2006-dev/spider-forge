@@ -1,6 +1,9 @@
+import os
+from typing import Dict, Optional
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from typing import Optional, Dict
 from spiderforge.core.engine import run_full_security_assessment
 
 app = FastAPI(
@@ -13,15 +16,29 @@ class ScanRequest(BaseModel):
     target: str
     params: Optional[Dict[str, str]] = None
 
+# تقديم مجلد الواجهة كـ Static Files
+frontend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
+
+if os.path.exists(frontend_path):
+    app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+
 @app.get("/")
-def read_root():
-    return {"status": "online", "tool": "SpiderForge", "mode": "Web Platform"}
+def serve_index():
+    index_file = os.path.join(frontend_path, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {"status": "online", "message": "Frontend files not found, run via API."}
+
+@app.get("/styles.css")
+def serve_css():
+    return FileResponse(os.path.join(frontend_path, "styles.css"))
+
+@app.get("/app.js")
+def serve_js():
+    return FileResponse(os.path.join(frontend_path, "app.js"))
 
 @app.post("/api/scan")
 async def run_web_scan(request: ScanRequest):
-    """
-    تنفيذ نفس محرك الفحص الموحد وإرجاع النتائج بصيغة JSON للداشبورد
-    """
     results = await run_full_security_assessment(request.target, request.params)
     return {
         "status": "success",

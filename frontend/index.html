@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpiderForge - Web Pentest Console</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="glow-title">🕸️ SPIDERFORGE</h1>
+            <p>Unified Assessment Console • Kali Linux Red Team</p>
+        </header>
+
+        <div class="card scan-box">
+            <h2>Live Target Assessment</h2>
+            <div class="input-group">
+                <input type="url" id="target-url" placeholder="http://target.com/page.php?id=1" required />
+                <button id="scan-btn" onclick="startUnifiedScan()">Launch Assessment</button>
+            </div>
+        </div>
+
+        <div id="loading" class="card" style="display:none; text-align:center;">
+            <p class="blink">⚡ Executing modules (XSS, SQLi, Security Headers)...</p>
+        </div>
+
+        <div id="scan-results" class="card" style="display:none;">
+            <div class="results-header">
+                <h3>Assessment Findings</h3>
+                <span id="findings-count" class="badge">0 Issues</span>
+            </div>
+            <div id="vulnerabilities"></div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
