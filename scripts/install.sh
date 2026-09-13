@@ -54,10 +54,10 @@ browser:
   enabled: false
   screenshots: false
 reporting:
-  json: true
-  html: true
-  markdown: true
-  pdf: false
+  enable_json: true
+  enable_html: true
+  enable_markdown: true
+  enable_pdf: false
 logging:
   level: INFO
 YAML
@@ -71,9 +71,15 @@ if command -v spiderforge >/dev/null 2>&1; then
   else
     read -r -p "$(printf '\033[1;33m[%s]\033[0m Install Chromium for browser automation? [y/N] ' "$APP")" ans || true
     case "$ans" in
-      y|Y) "$PY" -m pip install --user "playwright>=1.44.0" || true
-           spiderforge browser install || warn "Chromium install failed — rerun: spiderforge browser install"
-           ;;
+      y|Y) 
+        if command -v pipx >/dev/null 2>&1; then
+            log "Injecting playwright into pipx environment..."
+            pipx inject spiderforge "playwright>=1.44.0" || true
+        else
+            "$PY" -m pip install --user "playwright>=1.44.0" || true
+        fi
+        spiderforge browser install || warn "Chromium install failed — rerun: spiderforge browser install"
+        ;;
       *) warn "Skipped. Run 'spiderforge browser install' when ready." ;;
     esac
   fi

@@ -98,6 +98,9 @@ def scan_run(
     debug: bool = typer.Option(False, "--debug"),
 ) -> None:
     """Run everything in one command."""
+    if not target.startswith(("http://", "https://")):
+        target = f"http://{target}"
+
     setup_logging(level="DEBUG" if debug else "INFO", quiet=quiet)
     cfg = load_config(profile=profile)
 

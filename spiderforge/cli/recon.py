@@ -41,6 +41,11 @@ def recon_run(
     debug: bool = typer.Option(False, "--debug", help="Verbose logging."),
 ) -> None:
     """Run the full recon pipeline and print a report."""
+    
+    # التعديل الجديد: إصلاح مسار الـ URL
+    if not target.startswith(("http://", "https://")):
+        target = f"http://{target}"
+
     setup_logging(level="DEBUG" if debug else "INFO", quiet=quiet)
     cfg = load_config(profile=profile)
 

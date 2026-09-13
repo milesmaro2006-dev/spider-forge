@@ -29,10 +29,10 @@ class BrowserConfig(BaseModel):
 
 
 class ReportingConfig(BaseModel):
-    json: bool = True
-    html: bool = True
-    markdown: bool = True
-    pdf: bool = False
+    enable_json: bool = True
+    enable_html: bool = True
+    enable_markdown: bool = True
+    enable_pdf: bool = False
 
 
 class StorageConfig(BaseModel):

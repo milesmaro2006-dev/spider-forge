@@ -1,104 +1,86 @@
-from __future__ import annotations
-
 import typer
 from rich.console import Console
 from rich.panel import Panel
+from rich.prompt import Prompt
 
-from spiderforge import __version__
-from spiderforge.cli import browser as browser_module
-from spiderforge.cli import config as config_module
-from spiderforge.cli import crawl as crawl_module
-from spiderforge.cli import discover as discover_module
-from spiderforge.cli import doctor as doctor_module
-from spiderforge.cli import findings as findings_module
-from spiderforge.cli import history as history_module
-from spiderforge.cli import integrations as integrations_module
-from spiderforge.cli import modules as modules_module
-from spiderforge.cli import recon as recon_module
-from spiderforge.cli import report as report_module
-from spiderforge.cli import scan as scan_module
-from spiderforge.cli import scope as scope_module
-from spiderforge.cli import update as update_module
-from spiderforge.utils.logging import setup_logging
+from spiderforge.cli import recon, scan, report, doctor
 
 app = typer.Typer(
     name="spiderforge",
-    help="SpiderForge — Personal Web Security Assessment Platform.",
-    no_args_is_help=False,
+    help="Advanced Web Reconnaissance & Security Assessment Framework",
     add_completion=False,
-    rich_markup_mode="rich",
 )
+
+# تسجيل الأوامر الرئيسية المتاحة
+app.add_typer(recon.app, name="recon")
+app.add_typer(scan.app, name="scan")
+app.add_typer(report.app, name="report")
+
 console = Console()
 
+BANNER = """
+[bold red]    ███████╗██████╗ ██╗██████╗ ███████╗██████╗ ███████╗██████╗ ██████╗  ██████╗ ███████╗
+    ██╔════╝██╔══██╗██║██╔══██╗██╔════╝██╔══██╗██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔════╝
+    ███████╗██████╔╝██║██║  ██║█████╗  ██████╔╝█████╗  ██║   ██║██████╔╝██║  ███╗█████╗  
+    ╚════██║██╔═══╝ ██║██║  ██║██╔══╝  ██╔══██╗██╔══╝  ██║   ██║██╔══██║██║   ██║██╔══╝  
+    ███████║██║     ██║██████╔╝███████╗██║  ██║██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗
+    ╚══════╝╚═╝     ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝     ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝[/bold red]
+[dim white]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/dim white]
+[bold cyan]  [+] Framework:[/bold cyan] SpiderForge v1.0.0    [bold cyan]• Author:[/bold cyan] Spidey (@redteam)
+[bold cyan]  [+] Core Engine:[/bold cyan] Async / Modular       [bold cyan]• Security Modules:[/bold cyan] 12 Active
+[dim white]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/dim white]
+"""
 
 @app.callback(invoke_without_command=True)
-def _root(
-    ctx: typer.Context,
-    version: bool = typer.Option(
-        False, "--version", "-V", help="Show version and exit.", is_eager=True
-    ),
-) -> None:
-    if version:
-        console.print(f"SpiderForge {__version__}")
-        raise typer.Exit()
-    if ctx.invoked_subcommand is None:
-        _banner()
+def main(ctx: typer.Context):
+    """
+    SpiderForge CLI Framework. If no command is provided, an interactive menu will launch.
+    """
+    if ctx.invoked_subcommand is not None:
+        return
 
+    # عرض الواجهة التفاعلية بالبانر الجديد
+    console.clear()
+    console.print(BANNER)
+    console.print(Panel("[bold green]Welcome to SpiderForge Interactive Control Center[/bold green]\nPlease select an option below to get started:", title="[b]Interactive Mode[/b]", border_style="red"))
 
-def _banner() -> None:
-    console.print(
-        Panel.fit(
-            f"[bold cyan]SPIDERFORGE[/bold cyan]\n"
-            f"[white]Web Security Assessment Engine[/white]\n\n"
-            f"Version: [bold]{__version__}[/bold]\n\n"
-            f"[bold]Commands:[/bold]\n"
-            f"  scan         Full assessment (recon → crawl → discover → analyze)\n"
-            f"  recon        DNS, HTTP probe, tech detection, robots, sitemap\n"
-            f"  crawl        Async crawler\n"
-            f"  discover     Endpoints, params, APIs, JS, Swagger, GraphQL\n"
-            f"  modules      List / inspect security modules\n"
-            f"  findings     List / show / confirm / false-positive / retest\n"
-            f"  report       Generate JSON/MD/HTML/PDF reports\n"
-            f"  history      Scan history and diffs\n"
-            f"  scope        Parse and validate scope files\n"
-            f"  config       Inspect effective configuration\n"
-            f"  browser      Playwright / Chromium management\n"
-            f"  integrations Check external tool availability\n"
-            f"  doctor       System readiness\n"
-            f"  update       Check for updates",
-            title="SpiderForge",
-            border_style="cyan",
-        )
-    )
+    while True:
+        console.print("\n[1] 🎯 Run Full Assessment (Scan)")
+        console.print("[2] 🔍 Run Reconnaissance Only")
+        console.print("[3] 📊 Generate Reports")
+        console.print("[4] 🩺 Run System Diagnostics (Doctor)")
+        console.print("[5] 🚪 Exit")
 
+        choice = Prompt.ask("\n[bold yellow]Select an option[/bold yellow]", choices=["1", "2", "3", "4", "5"], default="1")
 
-app.command(name="doctor", help="Check system readiness.")(doctor_module.doctor)
-
-
-@app.command(name="version", help="Print version and exit.")
-def version_cmd() -> None:
-    console.print(f"SpiderForge {__version__}")
-
-
-app.add_typer(scope_module.app, name="scope")
-app.add_typer(config_module.app, name="config")
-app.add_typer(recon_module.app, name="recon")
-app.add_typer(crawl_module.app, name="crawl")
-app.add_typer(discover_module.app, name="discover")
-app.add_typer(scan_module.app, name="scan")
-app.add_typer(modules_module.app, name="modules")
-app.add_typer(findings_module.app, name="findings")
-app.add_typer(report_module.app, name="report")
-app.add_typer(history_module.app, name="history")
-app.add_typer(browser_module.app, name="browser")
-app.add_typer(integrations_module.app, name="integrations")
-app.add_typer(update_module.app, name="update")
-
-
-def main() -> None:  # pragma: no cover
-    setup_logging()
-    app()
-
+        if choice == "1":
+            target = Prompt.ask("[bold cyan]Enter target URL (e.g., http://example.com)[/bold cyan]")
+            if target:
+                console.print(f"[bold green][*] Launching full assessment on {target}...[/bold green]")
+                ctx.invoke(scan.scan_run, target=target)
+            break
+        elif choice == "2":
+            target = Prompt.ask("[bold cyan]Enter target URL for recon[/bold cyan]")
+            if target:
+                console.print(f"[bold green][*] Running reconnaissance on {target}...[/bold green]")
+                ctx.invoke(recon.recon_run, target=target)
+            break
+        elif choice == "3":
+            workspace = Prompt.ask("[bold cyan]Enter workspace/scan path[/bold cyan]")
+            if workspace:
+                console.print(f"[bold green][*] Generating reports for {workspace}...[/bold green]")
+                ctx.invoke(report.report_generate, scan_dir=workspace, format="json,md,html")
+            break
+        elif choice == "4":
+            console.print("[bold green][*] Running system health check...[/bold green]")
+            if hasattr(doctor, "doctor_run"):
+                doctor.doctor_run()
+            elif hasattr(doctor, "main"):
+                doctor.main()
+            break
+        elif choice == "5":
+            console.print("[bold red][!] Exiting SpiderForge. Stay safe![/bold red]")
+            raise typer.Exit()
 
 if __name__ == "__main__":
-    main()
+    app()
