@@ -17,6 +17,52 @@
   Scope-aware scanning. Real findings. Professional reports.
 </p>
 
+## 📸 Showcase & Key Modules
+
+<p align="center">
+  <b>1. Interactive Control Center & CLI Menu</b><br>
+  <sub>Terminal dashboard providing unified access to scans, recon, reporting, and diagnostics</sub><br>
+  
+</p><img width="1459" height="585" alt="Screenshot 2026-09-14 191620" src="https://github.com/user-attachments/assets/a4333c28-c886-4eb4-8731-c5662fe4652a" />
+
+<br>
+
+<p align="center">
+  <b>2. Full Security Assessment & Vulnerability Engine</b><br>
+  <sub>Active scanning against target scopes with findings and evidence tables</sub><br>
+<img width="1728" height="726" alt="Screenshot 2026-09-14 211407" src="https://github.com/user-attachments/assets/40769591-9f98-4c86-b929-8e283d9aa240" />
+
+<br>
+
+<p align="center">
+  <b>3. Persistent Web Dashboard (FastAPI GUI)</b><br>
+  <sub>Web platform providing interactive scan dispatch and real-time finding feeds</sub><br>
+<img width="1918" height="797" alt="Screenshot 2026-09-14 211721" src="https://github.com/user-attachments/assets/4282862d-b371-4546-b08e-aaae94a67839" />
+
+
+<br>
+
+<p align="center">
+  <b>4. Passive & Active Reconnaissance Pipeline</b><br>
+  <sub>DNS enumeration, HTTP probes, technology fingerprinting, and asset discovery</sub><br>
+<img width="1485" height="724" alt="Screenshot 2026-09-14 211849" src="https://github.com/user-attachments/assets/85f5b2f3-8501-43a9-98a1-2324b5c0996c" />
+
+
+<br>
+
+<p align="center">
+  <b>5. Automated Multi-Format Report Generator</b><br>
+  <sub>Workspace report synthesis with instant browser viewing for HTML and PDF exports</sub><br>
+  <img width="1919" height="725" alt="Screenshot 2026-09-14 212125" src="https://github.com/user-attachments/assets/0cfe49d0-b3ed-4aaa-bbef-422e7650706b" />
+
+
+<br>
+
+<p align="center">
+  <b>6. System Diagnostics (Pre-flight Doctor)</b><br>
+  <sub>Automated verification of Python runtimes, binaries, dependencies, and network health</sub><br>
+<img width="1173" height="648" alt="Screenshot 2026-09-14 212414" src="https://github.com/user-attachments/assets/1e6e3c76-d94e-4d9c-8eeb-cf6c8d0a1eb3" />
+
 ---
 
 ## ⚡ Quick Start
