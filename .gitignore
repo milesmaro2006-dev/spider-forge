@@ -1,14 +1,36 @@
+# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
-build/
-dist/
 .venv/
 venv/
-.env
+env/
 .pytest_cache/
-.ruff_cache/
 .mypy_cache/
-*.db
-*.sqlite
+.ruff_cache/
+dist/
+build/
+
+# SpiderForge
 .spiderforge/
+scan_*/
+*_workspace/
+reports/
+server.log
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+.venv/
+scan_test_target/
+reports/
+*.pdf
+*.html

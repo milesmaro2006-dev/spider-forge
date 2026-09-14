@@ -1,38 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpiderForge - Web Pentest Console</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>SpiderForge — Web Security Assessment</title>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1 class="glow-title">🕸️ SPIDERFORGE</h1>
-            <p>Unified Assessment Console • Kali Linux Red Team</p>
+    <div class="app">
+
+        <!-- ───── Top Bar ───── -->
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true">🕷</div>
+                <div class="brand-text">
+                    <h1>SpiderForge</h1>
+                    <span>Web Security Assessment Console</span>
+                </div>
+            </div>
+            <div class="engine-status">
+                <span class="dot" aria-hidden="true"></span>
+                Engine Online
+            </div>
         </header>
 
-        <div class="card scan-box">
-            <h2>Live Target Assessment</h2>
-            <div class="input-group">
-                <input type="url" id="target-url" placeholder="http://target.com/page.php?id=1" required />
-                <button id="scan-btn" onclick="startUnifiedScan()">Launch Assessment</button>
+        <!-- ───── Scan Panel ───── -->
+        <section class="panel scan-panel">
+            <div class="panel-head">
+                <h2>Target Assessment</h2>
+                <p>Run active &amp; passive security checks against a web target.</p>
             </div>
-        </div>
 
-        <div id="loading" class="card" style="display:none; text-align:center;">
-            <p class="blink">⚡ Executing modules (XSS, SQLi, Security Headers)...</p>
-        </div>
+            <form class="input-row" onsubmit="event.preventDefault(); startUnifiedScan();">
+                <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                    <input
+                        type="url"
+                        id="target-url"
+                        placeholder="https://target.com/page.php?id=1"
+                        autocomplete="off"
+                        spellcheck="false"
+                        required
+                    />
+                </div>
+                <button id="scan-btn" type="submit">
+                    <span class="btn-label">Launch Assessment</span>
+                    <span class="btn-spinner" aria-hidden="true"></span>
+                </button>
+            </form>
+        </section>
 
-        <div id="scan-results" class="card" style="display:none;">
-            <div class="results-header">
+        <!-- ───── Loading ───── -->
+        <section id="loading" class="panel loading-panel" style="display:none;">
+            <div class="spinner" aria-hidden="true"></div>
+            <div class="loading-text">
+                <strong>Running assessment…</strong>
+                <span>Security Headers · SQL Injection · Reflected XSS</span>
+            </div>
+        </section>
+
+        <!-- ───── Results ───── -->
+        <section id="scan-results" class="panel results-panel" style="display:none;">
+            <div class="results-head">
                 <h3>Assessment Findings</h3>
-                <span id="findings-count" class="badge">0 Issues</span>
+                <span id="findings-count" class="badge" data-state="clean">0 Issues</span>
             </div>
-            <div id="vulnerabilities"></div>
-        </div>
+            <div id="vulnerabilities" class="findings-list"></div>
+        </section>
+
+        <!-- ───── Footer ───── -->
+        <footer class="footer">
+            <span>SpiderForge v2.0</span>
+            <span class="sep">•</span>
+            <span>For authorized security testing only</span>
+        </footer>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>

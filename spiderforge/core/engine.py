@@ -1,38 +1,67 @@
-from urllib.parse import urlparse, parse_qs, urlunparse
-from typing import Dict, Any, Optional
-from spiderforge.scanners.xss import check_reflected_xss
-from spiderforge.scanners.sqli import check_sql_injection
+# spiderforge/core/engine.py
+from __future__ import annotations
+
+import asyncio
+from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+
+import httpx
+
 from spiderforge.scanners.headers import check_security_headers
+from spiderforge.scanners.sqli import check_sql_injection
+from spiderforge.scanners.xss import check_reflected_xss
 
-def extract_url_params(target_url: str):
-    parsed = urlparse(target_url)
-    base_url = urlunparse((parsed.scheme, parsed.netloc, parsed.path, '', '', ''))
-    raw_params = parse_qs(parsed.query)
-    params = {k: v[0] for k, v in raw_params.items()}
-    return base_url, params
 
-async def run_full_security_assessment(target_url: str, params: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
-    base_url, parsed_params = extract_url_params(target_url)
-    effective_params = params if params is not None else parsed_params
-    
-    all_findings = []
-    
-    # 1. Headers Check
-    h_findings = await check_security_headers(base_url or target_url)
-    all_findings.extend(h_findings)
-    
-    # 2. XSS & SQLi Check (إذا كانت الباراميترات متوفرة)
-    if effective_params:
-        xss_findings = await check_reflected_xss(base_url, effective_params)
-        all_findings.extend(xss_findings)
-        
-        sqli_findings = await check_sql_injection(base_url, effective_params)
-        all_findings.extend(sqli_findings)
-        
+def _normalize_target(target: str) -> str:
+    target = target.strip()
+    if not target.startswith(("http://", "https://")):
+        target = "http://" + target
+    return target
+
+
+def _merge_params(url: str, params: Optional[Dict[str, str]]) -> str:
+    if not params:
+        return url
+    parsed = urlparse(url)
+    existing = parse_qs(parsed.query, keep_blank_values=True)
+    for k, v in params.items():
+        existing[k] = [v]
+    new_query = urlencode(existing, doseq=True)
+    return urlunparse(parsed._replace(query=new_query))
+
+
+async def run_full_security_assessment(
+    target: str,
+    params: Optional[Dict[str, str]] = None,
+) -> Dict[str, Any]:
+    """تشغيل الفحوصات الثلاثة بشكل متزامن على AsyncClient واحد."""
+
+    target = _normalize_target(target)
+    target = _merge_params(target, params)
+
+    findings: List[Dict[str, Any]] = []
+
+    async with httpx.AsyncClient(
+        timeout=10.0,
+        verify=False,
+        follow_redirects=True,
+        headers={"User-Agent": "SpiderForge/2.0 (+security-scanner)"},
+    ) as client:
+        # تشغيل الفحوصات الثلاثة بالتوازي
+        headers_task = check_security_headers(target, client)
+        sqli_task = check_sql_injection(target, client)
+        xss_task = check_reflected_xss(target, client)
+
+        headers_findings, sqli_findings, xss_findings = await asyncio.gather(
+            headers_task, sqli_task, xss_task, return_exceptions=False
+        )
+
+        findings.extend(headers_findings)
+        findings.extend(sqli_findings)
+        findings.extend(xss_findings)
+
     return {
-        "target": target_url,
-        "base_url": base_url,
-        "parameters": effective_params,
-        "total_findings": len(all_findings),
-        "findings": all_findings
+        "target": target,
+        "total_issues": len(findings),
+        "findings": findings,
     }

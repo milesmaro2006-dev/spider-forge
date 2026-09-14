@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from spiderforge.cli._utils import resolve
 from spiderforge.config.loader import load_config
 from spiderforge.core.events import Event, EventBus, EventType
 from spiderforge.recon.runner import ReconResult
@@ -41,8 +42,23 @@ def recon_run(
     debug: bool = typer.Option(False, "--debug", help="Verbose logging."),
 ) -> None:
     """Run the full recon pipeline and print a report."""
-    
-    # التعديل الجديد: إصلاح مسار الـ URL
+
+    # ── Defuse Typer OptionInfo/ArgumentInfo when called programmatically ──
+    target      = resolve(target, "") or ""
+    scope_file  = resolve(scope_file)
+    profile     = resolve(profile, "balanced")
+    timeout     = float(resolve(timeout, 20.0))
+    user_agent  = resolve(user_agent)
+    verify_tls  = bool(resolve(verify_tls, True))
+    no_sitemaps = bool(resolve(no_sitemaps, False))
+    json_out    = resolve(json_out)
+    quiet       = bool(resolve(quiet, False))
+    debug       = bool(resolve(debug, False))
+
+    # ── URL normalization ──
+    if not target:
+        console.print("[red]error[/red] target URL is required.")
+        raise typer.Exit(code=2)
     if not target.startswith(("http://", "https://")):
         target = f"http://{target}"
 
@@ -89,7 +105,10 @@ def recon_run(
             )
         )
 
-    ua = user_agent or cfg.scanner.user_agent
+    # ── Resolve UA safety net ──
+    ua = user_agent or getattr(cfg.scanner, "user_agent", None) or "SpiderForge/2.0"
+    if not isinstance(ua, str):
+        ua = str(ua)
 
     try:
         result = asyncio.run(
@@ -106,6 +125,9 @@ def recon_run(
     except KeyboardInterrupt:
         console.print("[red]aborted[/red]")
         raise typer.Exit(code=130) from None
+    except Exception as exc:  # noqa: BLE001
+        console.print(f"[red]error[/red] {type(exc).__name__}: {exc}")
+        raise typer.Exit(code=1) from exc
 
     _print_summary(result)
 

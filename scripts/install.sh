@@ -1,46 +1,125 @@
 #!/usr/bin/env bash
-# SpiderForge installer for Kali / Debian / Ubuntu / macOS.
+# ═══════════════════════════════════════════════════════════════
+#  SpiderForge — One-shot installer
+#  Supports: Kali / Debian / Ubuntu / macOS
+# ═══════════════════════════════════════════════════════════════
 set -euo pipefail
 
 APP=spiderforge
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-log()  { printf "\033[1;36m[%s]\033[0m %s\n" "$APP" "$*"; }
-warn() { printf "\033[1;33m[%s]\033[0m %s\n" "$APP" "$*"; }
-die()  { printf "\033[1;31m[%s]\033[0m %s\n" "$APP" "$*" >&2; exit 1; }
+# ─── Colors ───
+CYAN=$'\033[1;36m'; GREEN=$'\033[1;32m'; YELLOW=$'\033[1;33m'
+RED=$'\033[1;31m'; DIM=$'\033[2m'; RESET=$'\033[0m'
 
-# --- 1. Python check -------------------------------------------------------
+log()  { printf "%s[%s]%s %s\n" "$CYAN" "$APP" "$RESET" "$*"; }
+ok()   { printf "%s[✓]%s %s\n" "$GREEN" "$RESET" "$*"; }
+warn() { printf "%s[!]%s %s\n" "$YELLOW" "$RESET" "$*"; }
+die()  { printf "%s[✗]%s %s\n" "$RED" "$RESET" "$*" >&2; exit 1; }
+ask()  { printf "%s[?]%s %s " "$CYAN" "$RESET" "$*"; }
+
+# ═══════════════════════════════════════════════════════════════
+#  Banner
+# ═══════════════════════════════════════════════════════════════
+printf "%s" "$CYAN"
+cat <<'BANNER'
+    ███████╗██████╗ ██╗██████╗ ███████╗██████╗ ███████╗ ██████╗ ██████╗  ██████╗ ███████╗
+    ██╔════╝██╔══██╗██║██╔══██╗██╔════╝██╔══██╗██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔════╝
+    ███████╗██████╔╝██║██║  ██║█████╗  ██████╔╝█████╗  ██║   ██║██████╔╝██║  ███╗█████╗
+    ╚════██║██╔═══╝ ██║██║  ██║██╔══╝  ██╔══██╗██╔══╝  ██║   ██║██╔══██║██║   ██║██╔══╝
+    ███████║██║     ██║██████╔╝███████╗██║  ██║██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗
+    ╚══════╝╚═╝     ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝     ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+BANNER
+printf "%s\n" "$RESET"
+
+# ═══════════════════════════════════════════════════════════════
+#  1) Python check
+# ═══════════════════════════════════════════════════════════════
 PY="$(command -v python3 || true)"
-[ -n "$PY" ] || die "python3 not found"
+[ -n "$PY" ] || die "python3 not found. Install Python 3.10+ first."
 "$PY" - <<'PY' || die "Python >= 3.10 required"
 import sys
 raise SystemExit(0 if sys.version_info[:2] >= (3, 10) else 1)
 PY
-log "Python OK: $($PY --version 2>&1)"
+ok "Python OK: $($PY --version 2>&1)"
 
-# --- 2. pip/pipx ----------------------------------------------------------
+# ═══════════════════════════════════════════════════════════════
+#  2) pipx check (install if missing)
+# ═══════════════════════════════════════════════════════════════
 if ! command -v pipx >/dev/null 2>&1; then
-  warn "pipx not found. Install it for a clean isolated install:"
-  warn "  python3 -m pip install --user pipx && python3 -m pipx ensurepath"
-fi
-
-# --- 3. Install -----------------------------------------------------------
-if command -v pipx >/dev/null 2>&1; then
-  log "Installing with pipx (from $REPO_DIR)"
-  pipx install --force "$REPO_DIR"
+    warn "pipx not found — installing..."
+    if command -v apt-get >/dev/null 2>&1; then
+        sudo apt-get update -qq
+        sudo apt-get install -y pipx || die "apt install pipx failed"
+    else
+        "$PY" -m pip install --user --upgrade pipx || die "pipx install failed"
+    fi
+    "$PY" -m pipx ensurepath || true
+    # أضف pipx للـ PATH في الجلسة الحالية
+    export PATH="$HOME/.local/bin:$PATH"
+    ok "pipx installed"
 else
-  log "Falling back to pip --user"
-  "$PY" -m pip install --user --upgrade "$REPO_DIR"
+    ok "pipx available: $(pipx --version)"
 fi
 
-# --- 4. Directories -------------------------------------------------------
-mkdir -p "$HOME/.spiderforge/workspaces" "$HOME/.spiderforge/logs" "$HOME/.config/spiderforge"
-log "Created ~/.spiderforge and ~/.config/spiderforge"
+# ═══════════════════════════════════════════════════════════════
+#  3) Install spiderforge core via pipx
+# ═══════════════════════════════════════════════════════════════
+log "Installing SpiderForge core (from $REPO_DIR)..."
+pipx install --force "$REPO_DIR" || die "spiderforge install failed"
+ok "spiderforge installed"
 
-# --- 5. Default config ----------------------------------------------------
+# ═══════════════════════════════════════════════════════════════
+#  4) Optional: Web Dashboard
+# ═══════════════════════════════════════════════════════════════
+ask "Install Web Dashboard (fastapi + uvicorn)? [y/N]"
+read -r WEB
+if [[ "${WEB:-N}" =~ ^[Yy]$ ]]; then
+    log "Installing web extras..."
+    pipx inject spiderforge fastapi "uvicorn[standard]" \
+        || warn "web inject failed — install manually: pipx inject spiderforge fastapi uvicorn[standard]"
+    ok "Web Dashboard ready"
+else
+    printf "%s  Skipped. Install later with:%s\n" "$DIM" "$RESET"
+    printf "%s    pipx inject spiderforge fastapi 'uvicorn[standard]'%s\n" "$DIM" "$RESET"
+fi
+
+# ═══════════════════════════════════════════════════════════════
+#  5) Optional: PDF export
+# ═══════════════════════════════════════════════════════════════
+ask "Install PDF export (weasyprint)? [y/N]"
+read -r PDF
+if [[ "${PDF:-N}" =~ ^[Yy]$ ]]; then
+    log "Installing PDF engine..."
+    # system libs (Linux only)
+    if command -v apt-get >/dev/null 2>&1; then
+        log "Installing system libraries for WeasyPrint..."
+        sudo apt-get install -y --no-install-recommends \
+            libpango-1.0-0 libpangoft2-1.0-0 libcairo2 libgdk-pixbuf-2.0-0 \
+            || warn "some system libs failed to install"
+    fi
+    pipx inject spiderforge weasyprint \
+        || warn "weasyprint inject failed — install manually"
+    ok "PDF export ready"
+else
+    printf "%s  Skipped. Install later with:%s\n" "$DIM" "$RESET"
+    printf "%s    pipx inject spiderforge weasyprint%s\n" "$DIM" "$RESET"
+fi
+
+# ═══════════════════════════════════════════════════════════════
+#  6) Create user directories
+# ═══════════════════════════════════════════════════════════════
+mkdir -p "$HOME/.spiderforge/workspaces" \
+         "$HOME/.spiderforge/logs" \
+         "$HOME/.config/spiderforge"
+ok "Created ~/.spiderforge and ~/.config/spiderforge"
+
+# ═══════════════════════════════════════════════════════════════
+#  7) Default config
+# ═══════════════════════════════════════════════════════════════
 CFG="$HOME/.config/spiderforge/config.yaml"
 if [ ! -f "$CFG" ]; then
-  cat > "$CFG" <<'YAML'
+    cat > "$CFG" <<'YAML'
 scanner:
   concurrency: 20
   timeout: 20.0
@@ -61,38 +140,21 @@ reporting:
 logging:
   level: INFO
 YAML
-  log "Wrote default config to $CFG"
+    ok "Wrote default config to $CFG"
 fi
 
-# --- 6. Playwright (optional) --------------------------------------------
+# ═══════════════════════════════════════════════════════════════
+#  8) Health check
+# ═══════════════════════════════════════════════════════════════
+echo ""
+log "Running pre-flight health check..."
 if command -v spiderforge >/dev/null 2>&1; then
-  if spiderforge browser status 2>/dev/null | grep -q "installed"; then
-    log "Chromium already installed"
-  else
-    read -r -p "$(printf '\033[1;33m[%s]\033[0m Install Chromium for browser automation? [y/N] ' "$APP")" ans || true
-    case "$ans" in
-      y|Y) 
-        if command -v pipx >/dev/null 2>&1; then
-            log "Injecting playwright into pipx environment..."
-            pipx inject spiderforge "playwright>=1.44.0" || true
-        else
-            "$PY" -m pip install --user "playwright>=1.44.0" || true
-        fi
-        spiderforge browser install || warn "Chromium install failed — rerun: spiderforge browser install"
-        ;;
-      *) warn "Skipped. Run 'spiderforge browser install' when ready." ;;
-    esac
-  fi
-
-  log "Checking external tools..."
-  spiderforge integrations check || true
-
-  log "Running doctor..."
-  spiderforge doctor || warn "doctor returned non-zero"
-
-  log "Installed version: $(spiderforge --version 2>&1)"
+    spiderforge doctor || warn "doctor returned non-zero"
 else
-  warn "spiderforge not on PATH yet — restart your shell or run 'pipx ensurepath'"
+    warn "spiderforge not on PATH yet."
+    warn "Restart your shell, or run: export PATH=\"\$HOME/.local/bin:\$PATH\""
 fi
 
-log "Done."
+echo ""
+ok "Installation complete!"
+printf "%sRun:%s  %sspiderforge%s\n" "$DIM" "$RESET" "$GREEN" "$RESET"
