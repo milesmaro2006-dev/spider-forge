@@ -1,3 +1,4 @@
+```markdown
 <p align="center">
   <h1 align="center">🕷️ SpiderForge</h1>
   <p align="center">
@@ -24,36 +25,37 @@ The goal of SpiderForge is to automate the repetitive parts of a web security as
 SpiderForge is designed around an assessment lifecycle that starts with target scoping and reconnaissance, continues through crawling and endpoint discovery, and then performs security analysis and report generation.
 
 ### Assessment Lifecycle
-Target
-│
-▼
-Scope Validation
-│
-▼
-Reconnaissance
-│
-▼
-HTTP Probing
-│
-▼
-Crawling
-│
-▼
-Endpoint Discovery
-│
-▼
-Security Analysis
-│
-▼
-Evidence Collection
-│
-▼
-Finding Management
-│
-▼
-Report Generation
 
-text
+```text
+Target
+  │
+  ▼
+Scope Validation
+  │
+  ▼
+Reconnaissance
+  │
+  ▼
+HTTP Probing
+  │
+  ▼
+Crawling
+  │
+  ▼
+Endpoint Discovery
+  │
+  ▼
+Security Analysis
+  │
+  ▼
+Evidence Collection
+  │
+  ▼
+Finding Management
+  │
+  ▼
+Report Generation
+```
 
 ---
 
@@ -182,24 +184,25 @@ SpiderForge supports structured security reports in multiple formats:
 * **PDF** — professional, shareable (requires WeasyPrint)
 
 Report workflow:
-Scan
-│
-├── Recon Results
-├── Crawled URLs
-├── Discovered Endpoints
-├── Security Findings
-├── Evidence
-└── Metadata
-│
-▼
-Report Generator
-│
-├── JSON
-├── Markdown
-├── HTML
-└── PDF
 
-text
+```text
+Scan
+  │
+  ├── Recon Results
+  ├── Crawled URLs
+  ├── Discovered Endpoints
+  ├── Security Findings
+  ├── Evidence
+  └── Metadata
+        │
+        ▼
+   Report Generator
+        │
+        ├── JSON
+        ├── Markdown
+        ├── HTML
+        └── PDF
+```
 
 ---
 
@@ -242,22 +245,20 @@ SpiderForge provides a command-line interface built around modular workflows.
 
 ```bash
 spiderforge
+```
+
 Opens an interactive control center with:
 
-🎯 Run Full Assessment (Scan)
+1. 🎯 Run Full Assessment (Scan)
+2. 🌐 Launch Web Dashboard (GUI)
+3. 🔍 Run Reconnaissance Only
+4. 📊 Generate Reports
+5. 🩺 Run System Diagnostics (Doctor)
+6. 🚪 Exit
 
-🌐 Launch Web Dashboard (GUI)
+### Direct Commands
 
-🔍 Run Reconnaissance Only
-
-📊 Generate Reports
-
-🩺 Run System Diagnostics (Doctor)
-
-🚪 Exit
-
-Direct Commands
-bash
+```bash
 # Full assessment
 spiderforge scan run https://example.com
 
@@ -276,119 +277,139 @@ spiderforge doctor --cli-only
 
 # JSON output (for CI)
 spiderforge doctor --json
-Web Dashboard
+```
+
+---
+
+## Web Dashboard
+
 SpiderForge ships an optional FastAPI-based web dashboard for interactive scanning
 from the browser.
 
-bash
+```bash
 # Launch via CLI menu
 spiderforge    # → [2] Launch Web Dashboard
 
 # Or directly
 uvicorn backend.main:app --host 127.0.0.1 --port 8000
+```
+
 Open http://127.0.0.1:8000 to access:
 
-Interactive target scanner
+* Interactive target scanner
+* Real-time findings with severity badges
+* Downloadable reports (PDF / HTML)
+* Network-accessible via `--host 0.0.0.0`
 
-Real-time findings with severity badges
+---
 
-Downloadable reports (PDF / HTML)
+## Installation
 
-Network-accessible via --host 0.0.0.0
+### Requirements
 
-Installation
-Requirements
-Python 3.10+
+* Python 3.10+
+* Linux or macOS (Windows via WSL)
+* pipx recommended
 
-Linux or macOS (Windows via WSL)
+### Quick Install (recommended)
 
-pipx recommended
-
-Quick Install (recommended)
-bash
+```bash
 git clone https://github.com/milesmaro2006-dev/spider-forge.git
 cd spider-forge
 chmod +x scripts/install.sh
 ./scripts/install.sh
+```
+
 The installer will:
 
-Verify Python version
+1. Verify Python version
+2. Install pipx if missing
+3. Install SpiderForge core
+4. Optionally install Web Dashboard
+5. Optionally install PDF export
+6. Create `~/.spiderforge` and `~/.config/spiderforge`
+7. Run a system health check
 
-Install pipx if missing
+### Alternative — pipx from git
 
-Install SpiderForge core
-
-Optionally install Web Dashboard
-
-Optionally install PDF export
-
-Create ~/.spiderforge and ~/.config/spiderforge
-
-Run a system health check
-
-Alternative — pipx from git
-bash
+```bash
 pipx install git+https://github.com/milesmaro2006-dev/spider-forge.git
 
 # Optional extras
 pipx inject spiderforge fastapi "uvicorn[standard]"   # Web Dashboard
 pipx inject spiderforge weasyprint                    # PDF export
-Manual Installation
-bash
+```
+
+### Manual Installation
+
+```bash
 git clone https://github.com/milesmaro2006-dev/spider-forge.git
 cd spider-forge
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[web,pdf]"
-Verify
-bash
+```
+
+### Verify
+
+```bash
 spiderforge doctor
+```
+
 Expected output:
 
-text
+```text
 ╭───────────────────────────────────────────╮
 │ Checks: 22   PASS: 22   WARN: 0   FAIL: 0 │
 │ System Status: Ready                      │
 ╰───────────────────────────────────────────╯
-Development Installation
-bash
+```
+
+---
+
+## Development Installation
+
+```bash
 git clone https://github.com/milesmaro2006-dev/spider-forge.git
 cd spider-forge
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 pytest
-Configuration
+```
+
+---
+
+## Configuration
+
 SpiderForge stores its configuration under:
 
-text
+```text
 ~/.config/spiderforge/
+```
+
 Default workspace data is stored under:
 
-text
+```text
 ~/.spiderforge/
 ├── workspaces/
 ├── logs/
 └── ...
+```
+
 Configuration can control:
 
-Request concurrency
+* Request concurrency
+* Request timeout
+* Crawl depth
+* Reconnaissance options
+* Browser automation
+* Reporting formats
+* Logging level
 
-Request timeout
+Example `config.yaml`:
 
-Crawl depth
-
-Reconnaissance options
-
-Browser automation
-
-Reporting formats
-
-Logging level
-
-Example config.yaml:
-
-yaml
+```yaml
 scanner:
   concurrency: 20
   timeout: 20.0
@@ -408,11 +429,17 @@ reporting:
   enable_pdf: false
 logging:
   level: INFO
-Security Design Principles
-Scope First
+```
+
+---
+
+## Security Design Principles
+
+### Scope First
+
 Every assessment begins with explicit target scope:
 
-text
+```text
 Scope
   ↓
 Validate
@@ -422,20 +449,28 @@ Enumerate
 Crawl
   ↓
 Analyze
-Evidence Driven
+```
+
+### Evidence Driven
+
 Every vulnerability finding contains enough evidence to reproduce the result.
 
-Modular Architecture
+### Modular Architecture
+
 Reconnaissance, crawling, discovery, analysis, evidence collection, and reporting
 are separated into independent components, allowing each to evolve without
 tightly coupling the framework.
 
-Safe Automation
+### Safe Automation
+
 Automated security testing minimizes unintended traffic and prevents accidental
 interaction with targets outside the authorized scope.
 
-Project Structure
-text
+---
+
+## Project Structure
+
+```text
 spider-forge/
 │
 ├── spiderforge/
@@ -475,38 +510,52 @@ spider-forge/
 ├── pyproject.toml
 ├── README.md
 └── LICENSE
-Roadmap
-✅ Implemented (v2.0)
-☑ Interactive CLI menu
-☑ Real SQL Injection (error-based) scanner
-☑ Real Reflected XSS scanner
-☑ Security headers analyzer
-☑ Async engine with shared HTTP client
-☑ Reports: JSON / Markdown / HTML / PDF
-☑ FastAPI web dashboard with live scanning
-☑ Interactive workspace selector
-☑ System Doctor (health check with exit codes)
-☑ pipx-based installation flow
-☑ Report serving via HTTP (inline + download)
-🚧 In Progress
-□ Complete database repository layer
-□ Complete reconnaissance pipeline
-□ Complete asynchronous crawler
-□ Expand endpoint discovery
-□ Additional analysis modules (SSRF, SSTI, IDOR, CORS)
-□ Evidence collection pipeline with screenshots
-□ CVSS v3.1 calculation
-□ Browser automation (Playwright)
-📋 Planned
-□ External tool integrations (Nuclei, FFUF)
-□ GitHub Actions CI/CD pipeline
-□ Expanded unit tests + E2E tests
-□ PyPI release
-□ Docker image
-□ Improved documentation
-Legal Disclaimer
-SpiderForge is intended only for authorized security testing, research, education,
-and defensive security assessments.
+```
+
+---
+
+## Roadmap
+
+### ✅ Implemented (v2.0)
+
+- [x] Interactive CLI menu
+- [x] Real SQL Injection (error-based) scanner
+- [x] Real Reflected XSS scanner
+- [x] Security headers analyzer
+- [x] Async engine with shared HTTP client
+- [x] Reports: JSON / Markdown / HTML / PDF
+- [x] FastAPI web dashboard with live scanning
+- [x] Interactive workspace selector
+- [x] System Doctor (health check with exit codes)
+- [x] pipx-based installation flow
+- [x] Report serving via HTTP (inline + download)
+
+### 🚧 In Progress
+
+- [ ] Complete database repository layer
+- [ ] Complete reconnaissance pipeline
+- [ ] Complete asynchronous crawler
+- [ ] Expand endpoint discovery
+- [ ] Additional analysis modules (SSRF, SSTI, IDOR, CORS)
+- [ ] Evidence collection pipeline with screenshots
+- [ ] CVSS v3.1 calculation
+- [ ] Browser automation (Playwright)
+
+### 📋 Planned
+
+- [ ] External tool integrations (Nuclei, FFUF)
+- [ ] GitHub Actions CI/CD pipeline
+- [ ] Expanded unit tests + E2E tests
+- [ ] PyPI release
+- [ ] Docker image
+- [ ] Improved documentation
+
+---
+
+## Legal Disclaimer
+
+SpiderForge is intended **only for authorized security testing, research, education,
+and defensive security assessments**.
 
 You must have explicit permission before scanning, crawling, fuzzing, or testing
 any system that you do not own or have authorization to assess.
@@ -517,16 +566,27 @@ or terms of service.
 The authors and contributors are not responsible for misuse, damage, or unauthorized
 activity involving this software.
 
-License
-SpiderForge is released under the MIT License.
+---
 
-See LICENSE for the full license text.
+## License
 
-Author
-Amr Shaban
+SpiderForge is released under the **MIT License**.
+
+See [`LICENSE`](LICENSE) for the full license text.
+
+---
+
+## Author
+
+**Amr Shaban**
 
 Cybersecurity Student — Offensive Security & Web Application Security
 
-GitHub: https://github.com/milesmaro2006-dev
+GitHub: [https://github.com/milesmaro2006-dev](https://github.com/milesmaro2006-dev)
 
-<p align="center"> <sub>Built with ❤️ for the security community</sub> </p> ```
+---
+
+<p align="center">
+  <sub>Built with ❤️ for the security community</sub>
+</p>
+```
