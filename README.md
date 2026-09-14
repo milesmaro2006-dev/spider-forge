@@ -1,9 +1,8 @@
 ```markdown
+<h1 align="center">🕷️ SpiderForge</h1>
+
 <p align="center">
-  <h1 align="center">🕷️ SpiderForge</h1>
-  <p align="center">
-    <b>Automated Web Reconnaissance, Crawling & Security Assessment Framework</b>
-  </p>
+  <b>Automated Web Reconnaissance, Crawling & Security Assessment Framework</b>
 </p>
 
 <p align="center">
@@ -63,23 +62,23 @@ Report Generation
 
 ### Scope-Aware Security Testing
 
-* Explicit target scope validation
-* Scope-aware crawling and analysis
-* Protection against accidental out-of-scope requests
-* Structured handling of external and third-party resources
-* Designed to support authorized Rules of Engagement (RoE)
+- Explicit target scope validation
+- Scope-aware crawling and analysis
+- Protection against accidental out-of-scope requests
+- Structured handling of external and third-party resources
+- Designed to support authorized Rules of Engagement (RoE)
 
 ### Reconnaissance
 
 SpiderForge provides automated reconnaissance capabilities including:
 
-* DNS enumeration (A / AAAA / CNAME / MX / NS / TXT / SOA)
-* HTTP/HTTPS probing
-* TLS certificate information
-* HTTP header collection
-* Technology fingerprinting
-* `robots.txt` discovery
-* Sitemap discovery
+- DNS enumeration (A / AAAA / CNAME / MX / NS / TXT / SOA)
+- HTTP/HTTPS probing
+- TLS certificate information
+- HTTP header collection
+- Technology fingerprinting
+- `robots.txt` discovery
+- Sitemap discovery
 
 ### Asynchronous Web Crawler
 
@@ -87,33 +86,32 @@ The crawler is designed to efficiently map web applications while respecting the
 
 Capabilities include:
 
-* Asynchronous HTTP requests
-* Configurable concurrency
-* Scope-aware URL processing
-* Link extraction
-* Form discovery
-* Parameter discovery
-* JavaScript endpoint extraction
-* Query parameter analysis
-* Crawl depth control
+- Asynchronous HTTP requests
+- Configurable concurrency
+- Scope-aware URL processing
+- Link extraction
+- Form discovery
+- Parameter discovery
+- JavaScript endpoint extraction
+- Query parameter analysis
+- Crawl depth control
 
 ### Endpoint & API Discovery
 
 SpiderForge is designed to identify and organize application attack surface components:
 
-* API endpoint discovery
-* Endpoint normalization
-* Parameter inference
-* JavaScript endpoint analysis
-* Swagger / OpenAPI detection
-* GraphQL detection
-* Hidden path discovery
-* Endpoint clustering
+- API endpoint discovery
+- Endpoint normalization
+- Parameter inference
+- JavaScript endpoint analysis
+- Swagger / OpenAPI detection
+- GraphQL detection
+- Hidden path discovery
+- Endpoint clustering
 
 ### Security Analysis Modules
 
-SpiderForge ships with real, active-analysis modules that have been tested against
-real-world targets:
+SpiderForge ships with real, active-analysis modules that have been tested against real-world targets:
 
 | Module | Type | Severity Range |
 |---|---|---|
@@ -138,13 +136,13 @@ real-world targets:
 
 Security findings are backed by reproducible evidence:
 
-* HTTP requests
-* HTTP responses
-* Request/response metadata
-* Relevant payloads
-* Screenshots
-* Evidence hashes
-* Finding-specific artifacts
+- HTTP requests
+- HTTP responses
+- Request/response metadata
+- Relevant payloads
+- Screenshots
+- Evidence hashes
+- Finding-specific artifacts
 
 Evidence can then be associated with individual findings and reports.
 
@@ -154,21 +152,21 @@ Evidence can then be associated with individual findings and reports.
 
 SpiderForge maintains structured vulnerability findings containing:
 
-* Finding title
-* Category
-* Severity (Critical / High / Medium / Low / Info)
-* Confidence
-* CVSS score
-* CVSS vector
-* Affected URL
-* HTTP method
-* Parameter
-* Description
-* Impact
-* Evidence
-* Remediation
-* Finding status
-* Finding fingerprint
+- Finding title
+- Category
+- Severity (Critical / High / Medium / Low / Info)
+- Confidence
+- CVSS score
+- CVSS vector
+- Affected URL
+- HTTP method
+- Parameter
+- Description
+- Impact
+- Evidence
+- Remediation
+- Finding status
+- Finding fingerprint
 
 The framework is designed to support vulnerability lifecycle management from initial detection through validation and reporting.
 
@@ -178,10 +176,10 @@ The framework is designed to support vulnerability lifecycle management from ini
 
 SpiderForge supports structured security reports in multiple formats:
 
-* **JSON** — machine-readable, ideal for CI/CD
-* **Markdown** — version-control friendly
-* **HTML** — rich, interactive, browser-viewable
-* **PDF** — professional, shareable (requires WeasyPrint)
+- **JSON** — machine-readable, ideal for CI/CD
+- **Markdown** — version-control friendly
+- **HTML** — rich, interactive, browser-viewable
+- **PDF** — professional, shareable (requires WeasyPrint)
 
 Report workflow:
 
@@ -212,10 +210,10 @@ SpiderForge ships with optional browser automation support for modern web applic
 
 The browser layer can be used for tasks that cannot be reliably performed using HTTP requests alone:
 
-* JavaScript-heavy applications
-* Browser-based interaction
-* Screenshot collection
-* Dynamic application analysis
+- JavaScript-heavy applications
+- Browser-based interaction
+- Screenshot collection
+- Dynamic application analysis
 
 Browser automation is optional and is based on Playwright/Chromium.
 
@@ -225,13 +223,13 @@ Browser automation is optional and is based on Playwright/Chromium.
 
 SpiderForge integrates with commonly used security tools when available:
 
-* **Nmap** — port scanning / service detection
-* **httpx** — HTTP probing
-* **Nuclei** — template-based vulnerability scanner
-* **FFUF** — web fuzzing
-* **Nikto** — web server scanner
-* **Gobuster** — directory / DNS brute-force
-* **WhatWeb** — technology fingerprinting
+- **Nmap** — port scanning / service detection
+- **httpx** — HTTP probing
+- **Nuclei** — template-based vulnerability scanner
+- **FFUF** — web fuzzing
+- **Nikto** — web server scanner
+- **Gobuster** — directory / DNS brute-force
+- **WhatWeb** — technology fingerprinting
 
 These integrations complement SpiderForge's native capabilities rather than replace them.
 
@@ -283,8 +281,7 @@ spiderforge doctor --json
 
 ## Web Dashboard
 
-SpiderForge ships an optional FastAPI-based web dashboard for interactive scanning
-from the browser.
+SpiderForge ships an optional FastAPI-based web dashboard for interactive scanning from the browser.
 
 ```bash
 # Launch via CLI menu
@@ -296,10 +293,10 @@ uvicorn backend.main:app --host 127.0.0.1 --port 8000
 
 Open http://127.0.0.1:8000 to access:
 
-* Interactive target scanner
-* Real-time findings with severity badges
-* Downloadable reports (PDF / HTML)
-* Network-accessible via `--host 0.0.0.0`
+- Interactive target scanner
+- Real-time findings with severity badges
+- Downloadable reports (PDF / HTML)
+- Network-accessible via `--host 0.0.0.0`
 
 ---
 
@@ -307,9 +304,9 @@ Open http://127.0.0.1:8000 to access:
 
 ### Requirements
 
-* Python 3.10+
-* Linux or macOS (Windows via WSL)
-* pipx recommended
+- Python 3.10+
+- Linux or macOS (Windows via WSL)
+- pipx recommended
 
 ### Quick Install (recommended)
 
@@ -399,13 +396,13 @@ Default workspace data is stored under:
 
 Configuration can control:
 
-* Request concurrency
-* Request timeout
-* Crawl depth
-* Reconnaissance options
-* Browser automation
-* Reporting formats
-* Logging level
+- Request concurrency
+- Request timeout
+- Crawl depth
+- Reconnaissance options
+- Browser automation
+- Reporting formats
+- Logging level
 
 Example `config.yaml`:
 
@@ -457,14 +454,11 @@ Every vulnerability finding contains enough evidence to reproduce the result.
 
 ### Modular Architecture
 
-Reconnaissance, crawling, discovery, analysis, evidence collection, and reporting
-are separated into independent components, allowing each to evolve without
-tightly coupling the framework.
+Reconnaissance, crawling, discovery, analysis, evidence collection, and reporting are separated into independent components, allowing each to evolve without tightly coupling the framework.
 
 ### Safe Automation
 
-Automated security testing minimizes unintended traffic and prevents accidental
-interaction with targets outside the authorized scope.
+Automated security testing minimizes unintended traffic and prevents accidental interaction with targets outside the authorized scope.
 
 ---
 
@@ -554,17 +548,13 @@ spider-forge/
 
 ## Legal Disclaimer
 
-SpiderForge is intended **only for authorized security testing, research, education,
-and defensive security assessments**.
+SpiderForge is intended **only for authorized security testing, research, education, and defensive security assessments**.
 
-You must have explicit permission before scanning, crawling, fuzzing, or testing
-any system that you do not own or have authorization to assess.
+You must have explicit permission before scanning, crawling, fuzzing, or testing any system that you do not own or have authorization to assess.
 
-Unauthorized security testing may violate applicable laws, regulations, contracts,
-or terms of service.
+Unauthorized security testing may violate applicable laws, regulations, contracts, or terms of service.
 
-The authors and contributors are not responsible for misuse, damage, or unauthorized
-activity involving this software.
+The authors and contributors are not responsible for misuse, damage, or unauthorized activity involving this software.
 
 ---
 
